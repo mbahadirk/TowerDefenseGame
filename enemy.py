@@ -14,11 +14,15 @@ class Enemy:
         road3 = road2 + 150
         self.posY = random.choice([road1, road2, road3])
 
-
+        # load images
+        self.zombie_image = pygame.image.load('images/zombie.png')
+        self.zombie_image = pygame.transform.scale(self.zombie_image, (100, 60))  # transform your img
+        self.zombie_shooted_image = pygame.image.load('images/zombieShooted.png')
+        self.zombie_shooted_image = pygame.transform.scale(self.zombie_shooted_image, (110, 70))  # transform your img
 
         self.health = 20
         self.speed = 2
-        self.attack_damage = 0.1
+        self.attack_damage = 0.01
 
         if self.posY == road1:
             self.tower = tower1
@@ -61,12 +65,11 @@ class Enemy:
         self.tower.health -= self.attack_damage
 
     def drawEnemy(self, screen):
-
-
-        self.zombie_image = pygame.image.load('images/zombie.png')
-        self.zombie_image = pygame.transform.scale(self.zombie_image, (100, 60))  # transform your img
-
-        screen.blit(self.zombie_image, (self.posX, self.posY))
+        if self.isHitted:
+            image = self.zombie_shooted_image
+        else:
+            image = self.zombie_image
+        screen.blit(image, (self.posX, self.posY))
         pygame.draw.rect(screen, color=(203, 23, 96),
                          rect=(self.posX + 40, self.posY - 5, self.health, 5))  # road 1 (top)
         self.enemyMove()
@@ -80,3 +83,29 @@ class Enemy:
         else:
             self.isJump = False
             self.jump_height = self.jump_h
+
+
+class BigZombie(Enemy):
+    def __init__(self, tower1, tower2, tower3):
+        super().__init__(tower1, tower2, tower3)
+        self.big_zombie_image = pygame.image.load('images/bigzombie.png')
+        self.big_zombie_image = pygame.transform.scale(self.big_zombie_image, (150, 150))
+
+        self.health = 50
+
+        road1 = 40
+        road2 = road1 + 150
+        road3 = road2 + 150
+        self.posY = random.choice([road1, road2, road3])
+
+    def drawEnemy(self, screen):
+        if self.isHitted:
+            image = self.big_zombie_image
+        else:
+            image = self.big_zombie_image
+        screen.blit(image, (self.posX, self.posY))
+        pygame.draw.rect(screen, color=(203, 23, 96),
+                         rect=(self.posX + 40, self.posY - 5, self.health, 5))  # road 1 (top)
+        self.enemyMove()
+    def takeDamage(self):
+        super().takeDamage()

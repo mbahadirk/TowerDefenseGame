@@ -26,15 +26,24 @@ tower2 = Tower(100,150)
 tower3 = Tower(0,300)
 
 # enemies
-enemies =[]
+enemies = []
+bigZombies = []
+# bigZombie = BigZombie(tower1, tower2, tower3)
 
 # gunman
 gunman = Gunman()
 rotationAngle = 0
+potatoMan = PotatoMan()
 
+# create enemies
 for i in range(10):
     enemy = Enemy(tower1, tower2, tower3)
     enemies.append(enemy)
+
+# create bigZombies
+for i in range(2):
+    bigZombie = BigZombie(tower1, tower2, tower3)
+    bigZombies.append(bigZombie)
 
 # game variables
 running = True
@@ -52,6 +61,14 @@ while running:
             if event.button == 1:
                 clickPosition = event.pos        # take the position of mouse click
                 gunman.isShooting = True
+
+                # to detect hits for bigzombie
+                distance = pygame.math.Vector2(bigZombie.posX + 80 - clickPosition[0],
+                                               bigZombie.posY + 70 - clickPosition[1]).length()
+                if distance < bigZombie.radius:
+                    bigZombie.isHitted = True
+
+                # to detect hits for enemies
                 for enemy in enemies:
                     distance = pygame.math.Vector2(enemy.posX + 50 - clickPosition[0],enemy.posY - clickPosition[1]).length()
                     if distance < enemy.radius:
@@ -62,6 +79,8 @@ while running:
     mousePosition = pygame.mouse.get_pos()
 
     rotationAngle = math.atan2(-(mousePosition[1] - gunman.posY), mousePosition[0] - gunman.posX)
+
+    # dt = saat.tick(60) / 1000.0
 
     # Draw the game elements on the screen
     screen.fill((50, 220, 50)) # grass background
@@ -87,18 +106,25 @@ while running:
 
     # kill the enemies who  out of health
     enemies = [enemy for enemy in enemies if enemy.isAlive]
+    bigZombies = [bigZombie for bigZombie in bigZombies if bigZombie.isAlive]
     # draw the enemies
     for enemy in enemies:
         enemy.drawEnemy(screen)
         enemy.takeDamage()
 
+    bigZombie.drawEnemy(screen)
+    bigZombie.takeDamage()
+
     # draw the gunman
-    gunman.drawGunman(screen=screen,rotationAngle=rotationAngle*50)
+    # gunman.drawGunman(screen=screen,rotationAngle=rotationAngle*50)
+    potatoMan.drawPotatoMan(screen = screen, rotationAngle= rotationAngle*50)
 
 
-    pygame.draw.circle(screen,mouseColor,mousePosition,10)
+    pygame.draw.circle(screen, mouseColor, mousePosition, 10)
     if 'clickPosition' in locals():
         pygame.draw.circle(screen, (236, 133, 21), clickPosition, 5)
+
+        del clickPosition
 
     pygame.display.update()
     clock.tick(60)
