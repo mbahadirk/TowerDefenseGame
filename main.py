@@ -5,6 +5,7 @@ from tower import *
 from enemy import *
 from player import *
 from bullet import *
+from buttons import *
 
 # Initialize pygame
 pygame.init()
@@ -33,8 +34,12 @@ enemies = []
 bigZombies = []
 towerList = [tower1, tower2, tower3]
 
+
 # player
-player = Player(screen, "potatoguy", "pistol")
+playerName = "cartoonboy"
+gunName = "pistol"
+
+player = Player(screen, playerName, gunName)
 rotationAngle = None
 
 
@@ -44,9 +49,22 @@ def createEnemies():
         enemy = Enemy(tower1, tower2, tower3)
         enemies.append(enemy)
 
+# button held actions
+def buttonHeldAction():
+    if player.gunName == "ak47":
+        bullet = Bullet(player.posX + 100, player.posY + 35,
+                        mousePosition[0], mousePosition[1], screen, rotationAngle, "bullet")
+        bullets.append(bullet)
+
 
 # bullet list
 bullets = []
+
+# buttons
+button1 = Button(350, 550, screen, 50, imageName="pistol")
+button2 = Button(450, 550, screen, 50, imageName="ak47")
+button3 = Button(550, 550, screen, 50, imageName="gunman")
+button4 = Button(650, 550, screen, 50, imageName="cartoonboy")
 
 # game variables
 running = True
@@ -55,6 +73,8 @@ current_image = 0
 mouseColor = (190, 37, 59)
 jumping = False
 tick = 60
+button_held = False
+button_held_delay = 200     # weapon shooting speed ^-1
 
 while running:
     for event in pygame.event.get():
@@ -62,13 +82,44 @@ while running:
             running = False
         if event.type == pygame.MOUSEBUTTONDOWN:
             if event.button == 1:
+
+                if button1.rect.collidepoint(event.pos):    # detects pressing button
+                    gunName = "pistol"
+                    player = Player(screen, playerName=playerName, gunName=gunName)
+                if button2.rect.collidepoint(event.pos):  # detects pressing button
+                    gunName = "ak47"
+                    player = Player(screen, playerName=playerName, gunName=gunName)
+                if button3.rect.collidepoint(event.pos):  # detects pressing button
+                    playerName = "gunman"
+                    player = Player(screen, playerName=playerName, gunName=gunName)
+                if button4.rect.collidepoint(event.pos):  # detects pressing button
+                    playerName = "cartoonboy"
+                    player = Player(screen, playerName=playerName, gunName=gunName)
+
+
                 clickPosition = event.pos  # take the position of mouse click
                 player.isShooting = True
+                player.isHop = True
 
                 # create a new bullet when click
                 bullet = Bullet(player.posX + 100, player.posY + 35,
-                                clickPosition[0], clickPosition[1], screen, rotationAngle)
+                                clickPosition[0], clickPosition[1], screen, rotationAngle, "bullet")
                 bullets.append(bullet)
+
+                button_held = True      # bool for button is helding
+                button_held_start_time = pygame.time.get_ticks()    # the time held has been started
+
+        elif event.type == pygame.MOUSEBUTTONUP:
+            if event.button == 1:
+                button_held = False
+
+    if button_held:
+        current_time = pygame.time.get_ticks()
+        if current_time - button_held_start_time >= button_held_delay:
+            buttonHeldAction()
+            button_held_start_time = pygame.time.get_ticks()
+
+
 
     keys = pygame.key.get_pressed()
 
@@ -103,7 +154,7 @@ while running:
     # draw the enemies
     for enemy in enemies:
         enemy.drawEnemy(screen)
-        enemy.takeDamage(1)
+        enemy.takeDamage(1)   # henüz merminin verdiği hasarı almak yerine parantezdeki hasarı alıyor
 
     # update and draw the bullets
     for bullet in bullets:
@@ -111,10 +162,17 @@ while running:
 
     # draw the player
     player.drawPlayer(rotationAngle=rotationAngle)
+    player.hopBack()
 
     # recreate the enemies when all dead
     if not len(enemies):
         createEnemies()
+
+    # draw buttons
+    button1.drawButton()
+    button2.drawButton()
+    button3.drawButton()
+    button4.drawButton()
 
     pygame.draw.circle(screen, mouseColor, mousePosition, 5)
     if 'clickPosition' in locals():

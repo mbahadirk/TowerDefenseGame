@@ -2,8 +2,9 @@ import pygame
 import math
 
 class Bullet:
-    def __init__(self, x, y, target_x, target_y, screen, rotationAngle):
-        self.image = pygame.image.load('images/bullet.png')
+    def __init__(self, x, y, target_x, target_y, screen, rotationAngle, bulletType):
+        self.bulletType = bulletType
+        self.image = pygame.image.load(f'images/{bulletType}.png')
         self.image = pygame.transform.scale(self.image, (20, 10))
         self.rect = self.image.get_rect()
         self.rect.center = (x, y)
@@ -38,4 +39,4 @@ class Bullet:
                 enemy.takeDamage(self.attack_damage)
                 if self in bullets:         # if bullet exists
                     bullets.remove(self)  # remove the bullet
-                break
+                    break

@@ -54,6 +54,7 @@ class Enemy:
         if self.health <= 0:
             self.isAlive = False
 
+
     def is_tower_in_range(self):
         distance = abs(self.posX - self.tower.posX)
         return distance <= self.range
