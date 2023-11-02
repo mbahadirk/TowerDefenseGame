@@ -3,7 +3,8 @@ import random
 import math
 from tower import *
 from enemy import *
-from gunman import *
+from player import *
+from bullet import *
 
 # Initialize pygame
 pygame.init()
@@ -16,42 +17,44 @@ screen = pygame.display.set_mode(window)
 pygame.display.set_caption("Tower Defense")
 game_font = pygame.font.Font(None, 50)  # Font for game over text
 grassBackground = pygame.image.load('images/grassBackground.jpg')
-grassBackground = pygame.transform.scale(grassBackground,(1200,600))
+grassBackground = pygame.transform.scale(grassBackground, (1200, 600))
 skyBackground = pygame.image.load('images/sky.png')
-skyBackground = pygame.transform.scale(skyBackground,(1200,200))
+skyBackground = pygame.transform.scale(skyBackground, (1200, 200))
+stoneBackground = pygame.image.load('images/stone.png')
+stoneBackground = pygame.transform.scale(stoneBackground, (1250, 70))
 
 # towers
-tower1 = Tower(0,0)
-tower2 = Tower(100,150)
-tower3 = Tower(0,300)
+tower1 = Tower(0, 0)
+tower2 = Tower(100, 150)
+tower3 = Tower(0, 300)
 
 # enemies
 enemies = []
 bigZombies = []
-# bigZombie = BigZombie(tower1, tower2, tower3)
+towerList = [tower1, tower2, tower3]
 
-# gunman
-gunman = Gunman()
-rotationAngle = 0
-potatoMan = PotatoMan()
+# player
+player = Player(screen, "potatoguy", "pistol")
+rotationAngle = None
+
 
 # create enemies
-for i in range(10):
-    enemy = Enemy(tower1, tower2, tower3)
-    enemies.append(enemy)
+def createEnemies():
+    for i in range(10):
+        enemy = Enemy(tower1, tower2, tower3)
+        enemies.append(enemy)
 
-# create bigZombies
-for i in range(2):
-    bigZombie = BigZombie(tower1, tower2, tower3)
-    bigZombies.append(bigZombie)
+
+# bullet list
+bullets = []
 
 # game variables
 running = True
 clock = pygame.time.Clock()
 current_image = 0
-mouseColor = (189, 197, 39)
+mouseColor = (190, 37, 59)
 jumping = False
-
+tick = 60
 
 while running:
     for event in pygame.event.get():
@@ -59,74 +62,67 @@ while running:
             running = False
         if event.type == pygame.MOUSEBUTTONDOWN:
             if event.button == 1:
-                clickPosition = event.pos        # take the position of mouse click
-                gunman.isShooting = True
+                clickPosition = event.pos  # take the position of mouse click
+                player.isShooting = True
 
-                # to detect hits for bigzombie
-                distance = pygame.math.Vector2(bigZombie.posX + 80 - clickPosition[0],
-                                               bigZombie.posY + 70 - clickPosition[1]).length()
-                if distance < bigZombie.radius:
-                    bigZombie.isHitted = True
+                # create a new bullet when click
+                bullet = Bullet(player.posX + 100, player.posY + 35,
+                                clickPosition[0], clickPosition[1], screen, rotationAngle)
+                bullets.append(bullet)
 
-                # to detect hits for enemies
-                for enemy in enemies:
-                    distance = pygame.math.Vector2(enemy.posX + 50 - clickPosition[0],enemy.posY - clickPosition[1]).length()
-                    if distance < enemy.radius:
-                        enemy.isHitted = True
-                        break
     keys = pygame.key.get_pressed()
 
     mousePosition = pygame.mouse.get_pos()
 
-    rotationAngle = math.atan2(-(mousePosition[1] - gunman.posY), mousePosition[0] - gunman.posX)
+    rotationAngle = 50 * math.atan2(-(mousePosition[1] - player.posY), mousePosition[0] - player.posX)
 
     # dt = saat.tick(60) / 1000.0
 
     # Draw the game elements on the screen
-    screen.fill((50, 220, 50)) # grass background
-    screen.blit(skyBackground,(0,0))
-    screen.blit(grassBackground,(0,110))
+    screen.fill((50, 220, 50))  # grass background
+    screen.blit(skyBackground, (0, 0))
+    screen.blit(grassBackground, (0, 110))
 
-    pygame.draw.rect(screen,color=(135,62,35),rect=(0,120,window_width,70)) # road 1 (top)
-    pygame.draw.rect(screen,color=(135,62,35),rect=(0,270,window_width,70)) # road 2 (mid)
-    pygame.draw.rect(screen,color=(135,62,35),rect=(0,420,window_width,70)) # road 3 (bottom)
+    screen.blit(stoneBackground, (0, 120))  # road 1 (top)
+    screen.blit(stoneBackground, (0, 270))  # road 2 (mid)
+    screen.blit(stoneBackground, (0, 420))  # road 3 (bottom)
 
     # set towers out of screen when they run out of health
-    if tower1.health >= 0:
-        tower1.drawTower(screen)
-    else: tower1.posX = -300
-    if tower2.health >= 0:
-        tower2.drawTower(screen)
-    else:
-        tower2.posX = -300
-    if tower3.health >= 0:
-        tower3.drawTower(screen)
-    else:
-        tower3.posX = -300
+    for tower in towerList:
+        if tower.health >= 0:
+            tower.drawTower(screen)
+        else:
+            tower.posX = -300
+
+    towerList = [tower for tower in towerList if tower.health > 0]
 
     # kill the enemies who  out of health
     enemies = [enemy for enemy in enemies if enemy.isAlive]
     bigZombies = [bigZombie for bigZombie in bigZombies if bigZombie.isAlive]
+
     # draw the enemies
     for enemy in enemies:
         enemy.drawEnemy(screen)
-        enemy.takeDamage()
+        enemy.takeDamage(1)
 
-    bigZombie.drawEnemy(screen)
-    bigZombie.takeDamage()
+    # update and draw the bullets
+    for bullet in bullets:
+        bullet.update(enemies, bullets)
 
-    # draw the gunman
-    # gunman.drawGunman(screen=screen,rotationAngle=rotationAngle*50)
-    potatoMan.drawPotatoMan(screen = screen, rotationAngle= rotationAngle*50)
+    # draw the player
+    player.drawPlayer(rotationAngle=rotationAngle)
 
+    # recreate the enemies when all dead
+    if not len(enemies):
+        createEnemies()
 
-    pygame.draw.circle(screen, mouseColor, mousePosition, 10)
+    pygame.draw.circle(screen, mouseColor, mousePosition, 5)
     if 'clickPosition' in locals():
         pygame.draw.circle(screen, (236, 133, 21), clickPosition, 5)
 
         del clickPosition
 
     pygame.display.update()
-    clock.tick(60)
+    clock.tick(tick)
 
 pygame.quit()
