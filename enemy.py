@@ -22,7 +22,7 @@ class Enemy:
 
         self.health = 20
         self.speed = 2
-        self.attack_damage = 0.01
+        self.attack_damage = 0.1
 
         if self.posY == road1:
             self.tower = tower1
@@ -92,7 +92,7 @@ class BigZombie(Enemy):
         self.big_zombie_image = pygame.transform.scale(self.big_zombie_image, (150, 150))
 
         self.health = 50
-
+        self.attack_damage = 3
         road1 = 40
         road2 = road1 + 150
         road3 = road2 + 150
