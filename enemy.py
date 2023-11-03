@@ -1,20 +1,28 @@
 import time
-
 import pygame
 import random
 
 
 class Enemy:
     def __init__(self, tower1, tower2, tower3):
-        self.isJump = False
-        self.isAlive = True
-        self.posX = random.randrange(1150, 1300)
         road1 = 120
         road2 = road1 + 150
         road3 = road2 + 150
+
+        self.isJump = False
+        self.isAlive = True
+
+        self.posX = random.randrange(1150, 1300)
         self.posY = random.choice([road1, road2, road3])
+        self.width = 70
+        self.height = 60
+        self.rect = None
 
-
+        # load images
+        self.zombie_image = pygame.image.load('images/zombie.png')
+        self.zombie_image = pygame.transform.scale(self.zombie_image, (self.width, self.height))
+        self.zombie_shooted_image = pygame.image.load('images/zombieShooted.png')
+        self.zombie_shooted_image = pygame.transform.scale(self.zombie_shooted_image, (self.width, self.height))
 
         self.health = 20
         self.speed = 2
@@ -35,16 +43,17 @@ class Enemy:
 
         self.isHitted = False
 
-    def takeDamage(self):
+    def takeDamage(self, damage):
         if self.isHitted:
             self.jumpBack()
-            self.health -= 0.5
+            self.health -= damage
 
         if not self.isJump:
             self.isHitted = False
 
         if self.health <= 0:
             self.isAlive = False
+
 
     def is_tower_in_range(self):
         distance = abs(self.posX - self.tower.posX)
@@ -61,15 +70,17 @@ class Enemy:
         self.tower.health -= self.attack_damage
 
     def drawEnemy(self, screen):
-
-
-        self.zombie_image = pygame.image.load('images/zombie.png')
-        self.zombie_image = pygame.transform.scale(self.zombie_image, (100, 60))  # transform your img
-
-        screen.blit(self.zombie_image, (self.posX, self.posY))
+        self.rect = pygame.Rect(self.posX, self.posY, self.width, self.height)
+        # pygame.draw.rect(screen,color = (0,255,0),rect=self.rect)
+        if self.isHitted:
+            image = self.zombie_shooted_image
+        else:
+            image = self.zombie_image
+        screen.blit(image, (self.posX, self.posY))
         pygame.draw.rect(screen, color=(203, 23, 96),
                          rect=(self.posX + 40, self.posY - 5, self.health, 5))  # road 1 (top)
         self.enemyMove()
+
 
     def jumpBack(self):
         self.isJump = True
