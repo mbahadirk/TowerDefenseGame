@@ -6,6 +6,7 @@ from enemy import *
 from player import *
 from bullet import *
 from buttons import *
+from score import *
 
 # Initialize pygame
 pygame.init()
@@ -23,6 +24,9 @@ skyBackground = pygame.image.load('images/sky.png')
 skyBackground = pygame.transform.scale(skyBackground, (1200, 200))
 stoneBackground = pygame.image.load('images/stone.png')
 stoneBackground = pygame.transform.scale(stoneBackground, (1250, 70))
+
+# score
+score = Score(screen)
 
 # towers
 tower1 = Tower(0, 0)
@@ -46,7 +50,7 @@ rotationAngle = None
 # create enemies
 def createEnemies():
     for i in range(10):
-        enemy = Enemy(tower1, tower2, tower3)
+        enemy = Enemy(tower1, tower2, tower3,"zombie", score, screen)
         enemies.append(enemy)
 
 # button held actions
@@ -55,6 +59,7 @@ def buttonHeldAction():
         bullet = Bullet(player.posX + 100, player.posY + 35,
                         mousePosition[0], mousePosition[1], screen, rotationAngle, "bullet")
         bullets.append(bullet)
+        player.hopBack()
 
 
 # bullet list
@@ -62,7 +67,7 @@ bullets = []
 
 # buttons
 button1 = Button(350, 550, screen, 50, imageName="pistol")
-button2 = Button(450, 550, screen, 50, imageName="ak47")
+button2 = Button(450, 550, screen, 50,text="ak47", imageName="ak47")
 button3 = Button(550, 550, screen, 50, imageName="gunman")
 button4 = Button(650, 550, screen, 50, imageName="cartoonboy")
 
@@ -127,7 +132,6 @@ while running:
 
     rotationAngle = 50 * math.atan2(-(mousePosition[1] - player.posY), mousePosition[0] - player.posX)
 
-    # dt = saat.tick(60) / 1000.0
 
     # Draw the game elements on the screen
     screen.fill((50, 220, 50))  # grass background
@@ -153,12 +157,13 @@ while running:
 
     # draw the enemies
     for enemy in enemies:
-        enemy.drawEnemy(screen)
-        enemy.takeDamage(1)   # henüz merminin verdiği hasarı almak yerine parantezdeki hasarı alıyor
+        enemy.drawEnemy()
+        enemy.takeDamage(0)
 
     # update and draw the bullets
     for bullet in bullets:
         bullet.update(enemies, bullets)
+
 
     # draw the player
     player.drawPlayer(rotationAngle=rotationAngle)
@@ -173,6 +178,9 @@ while running:
     button2.drawButton()
     button3.drawButton()
     button4.drawButton()
+
+    # draw the score
+    score.drawScore()
 
     pygame.draw.circle(screen, mouseColor, mousePosition, 5)
     if 'clickPosition' in locals():

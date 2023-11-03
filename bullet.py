@@ -4,14 +4,21 @@ import math
 class Bullet:
     def __init__(self, x, y, target_x, target_y, screen, rotationAngle, bulletType):
         self.bulletType = bulletType
+
+        # check bullettype and arange things
+        if bulletType == "bullet":
+            self.bulletSize = [20, 10]
+        elif bulletType == "fireball":
+            self.bulletSize = [50, 30]
+
         self.image = pygame.image.load(f'images/{bulletType}.png')
-        self.image = pygame.transform.scale(self.image, (20, 10))
+        self.image = pygame.transform.scale(self.image, self.bulletSize)
         self.rect = self.image.get_rect()
         self.rect.center = (x, y)
         self.target_x = target_x  # x position of mouseclick
         self.target_y = target_y  # y position of mouseclick
         self.speed = 15
-        self.attack_damage = 0.1
+        self.attack_damage = 5
         self.screen = screen
         self.rotationAngle = rotationAngle
 

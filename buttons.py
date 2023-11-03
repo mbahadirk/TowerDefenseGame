@@ -14,8 +14,6 @@ class Button:
 
 
     def drawButton(self):
-        text = self.font.render(self.text, True, (255, 255, 255))
-        textRect = text.get_rect(center=self.rect.center)
         pygame.draw.rect(self.screen, (243,177,83), (self.x-5,self.y-5,self.size+10,self.size+10))
         pygame.draw.rect(self.screen, self.color, self.rect)
 
@@ -23,3 +21,7 @@ class Button:
             buttonImage = pygame.image.load(f'images/{self.imageName}.png')
             buttonImage = pygame.transform.scale(buttonImage, (self.size-10,self.size-10))
             self.screen.blit(buttonImage, (self.x+5, self.y+5))
+        if self.text:
+            text = self.font.render(self.text, True, (0,0,0))
+            textRect = text.get_rect(center=self.rect.center)
+            self.screen.blit(text, textRect)
