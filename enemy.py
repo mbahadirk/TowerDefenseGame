@@ -4,11 +4,15 @@ import random
 
 
 class Enemy:
-    def __init__(self, tower1, tower2, tower3):
+    def __init__(self, tower1, tower2, tower3, enemyType, score,screen):
         road1 = 120
         road2 = road1 + 150
         road3 = road2 + 150
 
+        self.enemyValue = 10  # arange for another enemy types
+        self.score = score
+
+        self.screen = screen
         self.isJump = False
         self.isAlive = True
 
@@ -17,12 +21,17 @@ class Enemy:
         self.width = 70
         self.height = 60
         self.rect = None
+        self.enemyType = enemyType
 
         # load images
-        self.zombie_image = pygame.image.load('images/zombie.png')
-        self.zombie_image = pygame.transform.scale(self.zombie_image, (self.width, self.height))
-        self.zombie_shooted_image = pygame.image.load('images/zombieShooted.png')
-        self.zombie_shooted_image = pygame.transform.scale(self.zombie_shooted_image, (self.width, self.height))
+        self.enemy_image = pygame.image.load(f'images/{self.enemyType}.png')
+        self.enemy_image = pygame.transform.scale(self.enemy_image, (self.width, self.height))
+        try:
+            self.enemy_shooted_image = pygame.image.load(f'images/{self.enemyType}Shooted.png')
+            self.enemy_shooted_image = pygame.transform.scale(self.enemy_shooted_image, (self.width, self.height))
+        except FileNotFoundError:
+            print("shooted animation couldn't found")
+            self.enemy_shooted_image = pygame.image.load('images/none.png')
 
         self.health = 20
         self.speed = 2
@@ -53,6 +62,10 @@ class Enemy:
 
         if self.health <= 0:
             self.isAlive = False
+            self.score.score += self.enemyValue
+            self.score.isJumping =True
+            self.score.jumpScore()
+
 
 
     def is_tower_in_range(self):
@@ -68,16 +81,17 @@ class Enemy:
 
     def attack(self):
         self.tower.health -= self.attack_damage
+        self.jumpBack()
 
-    def drawEnemy(self, screen):
+    def drawEnemy(self):
         self.rect = pygame.Rect(self.posX, self.posY, self.width, self.height)
-        # pygame.draw.rect(screen,color = (0,255,0),rect=self.rect)
+        # pygame.draw.rect(self.screen,color = (0,255,0),rect=self.rect)   # you can use it for check hitbox
         if self.isHitted:
-            image = self.zombie_shooted_image
+            image = self.enemy_shooted_image
         else:
-            image = self.zombie_image
-        screen.blit(image, (self.posX, self.posY))
-        pygame.draw.rect(screen, color=(203, 23, 96),
+            image = self.enemy_image
+        self.screen.blit(image, (self.posX, self.posY))
+        pygame.draw.rect(self.screen, color=(203, 23, 96),
                          rect=(self.posX + 40, self.posY - 5, self.health, 5))  # road 1 (top)
         self.enemyMove()
 
