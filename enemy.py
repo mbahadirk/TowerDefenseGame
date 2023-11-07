@@ -4,8 +4,8 @@ import random
 
 
 class Enemy:
-    def __init__(self, tower1, tower2, tower3, enemyType, score,screen):
-        road1 = 120
+    def __init__(self, tower1, tower2, tower3, enemyType, score, screen, player):
+        road1 = 200
         road2 = road1 + 150
         road3 = road2 + 150
 
@@ -15,6 +15,7 @@ class Enemy:
         self.screen = screen
         self.isJump = False
         self.isAlive = True
+        self.player = player
 
         self.posX = random.randrange(1150, 1300)
         self.posY = random.choice([road1, road2, road3])
@@ -33,9 +34,9 @@ class Enemy:
             print("shooted animation couldn't found")
             self.enemy_shooted_image = pygame.image.load('images/none.png')
 
-        self.health = 20
+        self.health = 15
         self.speed = 2
-        self.attack_damage = 0.1
+        self.attack_damage = 0.05
 
         if self.posY == road1:
             self.tower = tower1
@@ -44,7 +45,7 @@ class Enemy:
         elif self.posY == road3:
             self.tower = tower3
 
-        self.range = 120
+        self.range = 0
         self.radius = 50
 
         self.jump_height = 5
@@ -63,24 +64,27 @@ class Enemy:
         if self.health <= 0:
             self.isAlive = False
             self.score.score += self.enemyValue
-            self.score.isJumping =True
+            self.score.isJumping = True
             self.score.jumpScore()
 
 
 
-    def is_tower_in_range(self):
-        distance = abs(self.posX - self.tower.posX)
-        return distance <= self.range
+    def is_tower_in_range(self, tower):
+        distance = abs(self.posX - tower.posX)
+        return distance <= self.range + tower.width
 
     def enemyMove(self):
-        if self.is_tower_in_range():
-            self.attack()
+        if self.is_tower_in_range(self.tower):
+            self.attack(self.tower)
         else:
-            self.isJump = False
+            self.posX -= self.speed
+        if self.is_tower_in_range(self.player):
+            self.attack(self.player)
+        else:
             self.posX -= self.speed
 
-    def attack(self):
-        self.tower.health -= self.attack_damage
+    def attack(self, opponent):
+        opponent.health -= self.attack_damage
         self.jumpBack()
 
     def drawEnemy(self):

@@ -36,3 +36,11 @@ class Score:
         else:
             self.isJump = False
             self.jump_height = self.jump_h
+
+    def gameOverScreen(self):
+        transparent_rect = pygame.Surface((1300, 600), pygame.SRCALPHA)
+        pygame.draw.rect(transparent_rect, (0, 0, 0, 200), (0, 0, 1300, 600))
+        self.screen.blit(transparent_rect, (0, 0))
+
+        text = self.font.render(f"GAME OVER", True, (255, 20, 20))
+        self.screen.blit(text, (500, 300, 100, 200))

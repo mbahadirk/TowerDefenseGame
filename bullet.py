@@ -17,7 +17,7 @@ class Bullet:
         self.rect.center = (x, y)
         self.target_x = target_x  # x position of mouseclick
         self.target_y = target_y  # y position of mouseclick
-        self.speed = 15
+        self.speed = 20
         self.attack_damage = 5
         self.screen = screen
         self.rotationAngle = rotationAngle
@@ -31,7 +31,7 @@ class Bullet:
         self.screen.blit(rotatedBullet, self.rect)
 
         # bullet goes in direction
-        if distance >= 10:
+        if distance >= 20:
             direction_x = dx / distance
             direction_y = dy / distance
             self.rect.x += direction_x * self.speed

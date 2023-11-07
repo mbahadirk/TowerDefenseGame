@@ -3,12 +3,14 @@ import pygame
 
 class Tower:
     def __init__(self, posX, posY):
-        self.rect = None
+        self.width = 150
         self.health = 100
         self.posX = posX
         self.posY = posY
         self.tower_image = pygame.image.load('images/tower.png')
         self.tower_image = pygame.transform.scale(self.tower_image, (200, 200))  # transform your img
+        self.font = pygame.font.Font(None, 36)
+
 
     def drawTower(self, screen):
         screen.blit(self.tower_image, (self.posX, self.posY))
