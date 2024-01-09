@@ -5,9 +5,9 @@ import random
 
 class Enemy:
     def __init__(self, tower1, tower2, tower3, enemyType, score, screen, player):
-        road1 = 200
-        road2 = road1 + 150
-        road3 = road2 + 150
+        road1 = 320
+        road2 = road1 + 70
+        road3 = road2 + 70
 
         self.enemyValue = 10  # arange for another enemy types
         self.score = score
@@ -19,8 +19,8 @@ class Enemy:
 
         self.posX = random.randrange(1150, 1300)
         self.posY = random.choice([road1, road2, road3])
-        self.width = 70
-        self.height = 60
+        self.width = 40
+        self.height = 40
         self.rect = None
         self.enemyType = enemyType
 
@@ -35,8 +35,8 @@ class Enemy:
             self.enemy_shooted_image = pygame.image.load('images/none.png')
 
         self.health = 15
-        self.speed = 2
-        self.attack_damage = 0.05
+        self.speed = 1
+        self.attack_damage = 0.1
 
         if self.posY == road1:
             self.tower = tower1
@@ -96,7 +96,7 @@ class Enemy:
             image = self.enemy_image
         self.screen.blit(image, (self.posX, self.posY))
         pygame.draw.rect(self.screen, color=(203, 23, 96),
-                         rect=(self.posX + 40, self.posY - 5, self.health, 5))  # road 1 (top)
+                         rect=(self.posX + 15, self.posY - 5, self.health, 5))  # road 1 (top)
         self.enemyMove()
 
 

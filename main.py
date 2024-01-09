@@ -18,22 +18,23 @@ window = (window_width, window_height)
 screen = pygame.display.set_mode(window)
 pygame.display.set_caption("Tower Defense")
 game_font = pygame.font.Font(None, 50)  # Font for game over text
-grassBackground = pygame.image.load('images/grassBackground.jpg')
+grassBackground = pygame.image.load('images/background.png')
 grassBackground = pygame.transform.scale(grassBackground, (1200, 600))
 skyBackground = pygame.image.load('images/sky.png')
 skyBackground = pygame.transform.scale(skyBackground, (1200, 200))
 stoneBackground = pygame.image.load('images/stone.png')
 stoneBackground = pygame.transform.scale(stoneBackground, (1250, 70))
+
 castle = pygame.image.load('images/castle.png')
-castle = pygame.transform.scale(castle, (200, 600))
+castle = pygame.transform.scale(castle, (400, 400))
 
 # score
 score = Score(screen)
 
 # towers
-tower1 = Tower(50, 80)
-tower2 = Tower(150, 230)
-tower3 = Tower(50, 380)
+tower1 = Tower(100, 280)
+tower2 = Tower(200, 350)
+tower3 = Tower(100, 420)
 towerList = [tower1, tower2, tower3]
 
 # enemies
@@ -50,8 +51,10 @@ rotationAngle = None
 
 # create enemies
 def createEnemies():
-    global player
-    for i in range(10):
+    global player, wave
+    _range = wave*3 +10
+    _range = int(_range)
+    for i in range(_range):
         enemy = Enemy(towerList[0], towerList[1], towerList[2], "zombie", score, screen, player)
         enemies.append(enemy)
 
@@ -91,6 +94,7 @@ tick = 60
 button_held = False
 button_held_delay = 200  # weapon shooting speed ^-1
 gameOver = False
+wave = 0
 
 
 def deadGame():
@@ -104,14 +108,16 @@ def deadGame():
 
 
 def restartGame():
-    global gameOver, towerList
+    global gameOver, towerList, enemies,wave
+    wave = 0
     print("game resetted")
     player.health = playerHealth
     gameOver = False
     score.score = 0
-    tower1 = Tower(50, 80)
-    tower2 = Tower(150, 230)
-    tower3 = Tower(50, 380)
+    enemies = []
+    tower1 = Tower(100, 280)
+    tower2 = Tower(200, 350)
+    tower3 = Tower(100, 420)
     towerList = [tower1, tower2, tower3]
     createEnemies()
 
@@ -123,9 +129,11 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_r:
+                restartGame()
         if event.type == pygame.MOUSEBUTTONDOWN:
             if event.button == 1:
-
                 if button1.rect.collidepoint(event.pos) and button1.active:  # detects pressing button
                     gunName = "pistol"
                     player = Player(screen, playerName=playerName, gunName=gunName)
@@ -156,7 +164,6 @@ while running:
 
                 button_held = True      # bool for button is helding
                 button_held_start_time = pygame.time.get_ticks()  # the time held has been started
-
         elif event.type == pygame.MOUSEBUTTONUP:
             if event.button == 1:
                 button_held = False
@@ -176,12 +183,15 @@ while running:
 
     # Draw the game elements on the screen
     screen.fill((50, 220, 50))  # grass background
-    screen.blit(skyBackground, (0, 0))
-    screen.blit(grassBackground, (0, 150))
+    screen.blit(grassBackground, (0, 0))
+    # screen.blit(skyBackground, (0, 0))
 
-    screen.blit(stoneBackground, (0, 200))  # road 1 (top)
-    screen.blit(stoneBackground, (0, 350))  # road 2 (mid)
-    screen.blit(stoneBackground, (0, 500))  # road 3 (bottom)
+    waveStat = game_font.render(f"wave:{wave}", True, (255, 50, 55))
+    screen.blit(waveStat, (600, 10))
+
+    # screen.blit(stoneBackground, (0, 200))  # road 1 (top)
+    # screen.blit(stoneBackground, (0, 350))  # road 2 (mid)
+    # screen.blit(stoneBackground, (0, 500))  # road 3 (bottom)
 
     # set towers out of screen when they run out of health
     for tower in towerList:
@@ -190,7 +200,7 @@ while running:
         else:
             tower.posX = -300
 
-    screen.blit(castle, (-110, 0))  # castle
+    screen.blit(castle, (-150, 150))  # castle
     towerList = [tower for tower in towerList]
 
     # kill the enemies who  out of health
@@ -211,7 +221,9 @@ while running:
 
     # recreate the enemies when all dead
     if not len(enemies) and not gameOver:
+        wave += 1
         createEnemies()
+
 
     # draw buttons
     for button in buttonList:

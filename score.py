@@ -2,7 +2,7 @@ import pygame
 
 class Score:
     def __init__(self, screen):
-        self.x = 600
+        self.x = 800
         self.y = 0
         self.score = 0
         self.screen = screen
@@ -18,9 +18,9 @@ class Score:
         self.isJumping = False
 
     def drawScore(self):
-        self.screen.blit(self.score_image, (self.x,self.y))
-        text = self.font.render(f"{self.score}", True, (255, 255, 255))
-        self.screen.blit(text,(self.x+self.coinSize[0], self.y+10))
+        self.screen.blit(self.score_image, (self.x,self.y+10))
+        text = self.font.render(f"{self.score}", True, (0, 0, 0))
+        self.screen.blit(text,(self.x+self.coinSize[0], self.y+20))
 
         # to jump score
         if self.isJumping:

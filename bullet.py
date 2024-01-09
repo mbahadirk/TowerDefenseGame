@@ -18,9 +18,12 @@ class Bullet:
         self.target_x = target_x  # x position of mouseclick
         self.target_y = target_y  # y position of mouseclick
         self.speed = 20
-        self.attack_damage = 5
         self.screen = screen
         self.rotationAngle = rotationAngle
+        if bulletType == "bullet":
+            self.attack_damage = 5
+        elif bulletType == "fireball":
+            self.attack_damage = 0.2
 
     def update(self, enemies, bullets):
         dx = self.target_x - self.rect.centerx
@@ -44,6 +47,6 @@ class Bullet:
             if self.rect.colliderect(enemy.rect):
                 enemy.isHitted = True
                 enemy.takeDamage(self.attack_damage)
-                if self in bullets:         # if bullet exists
+                if self in bullets and self.bulletType == "bullet":         # if bullet exists
                     bullets.remove(self)  # remove the bullet
                     break
