@@ -184,14 +184,10 @@ while running:
     # Draw the game elements on the screen
     screen.fill((50, 220, 50))  # grass background
     screen.blit(grassBackground, (0, 0))
-    # screen.blit(skyBackground, (0, 0))
 
     waveStat = game_font.render(f"wave:{wave}", True, (255, 50, 55))
     screen.blit(waveStat, (600, 10))
 
-    # screen.blit(stoneBackground, (0, 200))  # road 1 (top)
-    # screen.blit(stoneBackground, (0, 350))  # road 2 (mid)
-    # screen.blit(stoneBackground, (0, 500))  # road 3 (bottom)
 
     # set towers out of screen when they run out of health
     for tower in towerList:
